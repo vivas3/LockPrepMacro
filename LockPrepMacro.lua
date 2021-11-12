@@ -41,13 +41,20 @@ function NoTradingHS()
     return true
 end
 
+function ArenaCheck(num)
+    -- local inArena, inRankedArena = IsActiveBattlefieldArena()
+    local members = GetNumGroupMembers()
+    if members == num then
+        return true
+    end
+    return false
+end
 
 function UpdateLockPrep()
-    -- inArena, inRankedArena = IsActiveBattlefieldArena()
 
-    if UnitExists('party1') then
+    if ArenaCheck(2) then
         local texts = {
-            [1] = "/cast [nopet] Summon Imp\n/stopcasting [pet:Imp]\n/run UpdateLockPrep()",
+            [1] = "/cast [nopet:Imp] Summon Imp\n/stopcasting [pet:Imp]\n/run UpdateLockPrep()",
             [2] = "/cast [@party1] Fire Shield\n/cast [@party1] Unending Breath\n/run UpdateLockPrep()",
             [3] = "/cast [@player] Fire Shield\n/cast [@player] Unending Breath\n/run UpdateLockPrep()",
             [4] = "/cast [@party1] Detect Invisibility\n/run UpdateLockPrep()",
@@ -62,7 +69,11 @@ function UpdateLockPrep()
             [13] = "/run AcceptTrade()\n/run UpdateLockPrep()",
         }
         
-        if not UnitExists('pet') and NoCastingSpecificSpell('Summon Imp') then
+        if not UnitExists('pet') then
+            -- Summon Imp
+            LockPrepMacro:SetAttribute("macrotext", texts[1])
+
+        elseif (NoBuffExists('player', 'Fire Shield') or NoBuffExists('party1', 'Fire Shield')) and UnitCreatureFamily('pet') ~= "Imp" then
             -- Summon Imp
             LockPrepMacro:SetAttribute("macrotext", texts[1])
 
@@ -110,10 +121,9 @@ function UpdateLockPrep()
             -- Trade HS
             LockPrepMacro:SetAttribute("macrotext", texts[12])
 
-        elseif TradeFrame:IsShown() then
+        elseif TradeFrame:IsShown() and not HSTraded then
             -- Accept Trade
             LockPrepMacro:SetAttribute("macrotext", texts[13])
-            HSTraded = true
 
         elseif HSTraded and NoItemExists('Healthstone') then
             -- Cast HS
@@ -124,9 +134,28 @@ function UpdateLockPrep()
             LockPrepMacro:SetAttribute("macrotext", "/stopcasting\n/run UpdateLockPrep()")
 
         end
+    -- elseif ArenaCheck(3) then
+        -- @todo 3v3 sequences. Should be same as except for the Ritual of Souls instead of HS.
+        -- local texts = {
+        --     [1] = "/cast [nopet] Summon Imp\n/stopcasting [pet:Imp]\n/run UpdateLockPrep()",
+        --     [2] = "/cast [@party1] Fire Shield\n/cast [@party1] Unending Breath\n/run UpdateLockPrep()",
+        --     [2] = "/cast [@party2] Fire Shield\n/cast [@party1] Unending Breath\n/run UpdateLockPrep()",
+        --     [3] = "/cast [@player] Fire Shield\n/cast [@player] Unending Breath\n/run UpdateLockPrep()",
+        --     [4] = "/cast [@party1] Detect Invisibility\n/run UpdateLockPrep()",
+        --     [4] = "/cast [@party2] Detect Invisibility\n/run UpdateLockPrep()",
+        --     [5] = "/cast [@player] Detect Invisibility\n/run UpdateLockPrep()",
+        --     [6] = "/cast Fel Armor\n/run UpdateLockPrep()",
+        --     [7] = "/cast [pet:Imp] Summon Voidwalker\n/stopcasting [pet:Voidwalker]\n/run UpdateLockPrep()",
+        --     [8] = "/cast Create Spellstone\n/run UpdateLockPrep()",
+        --     [9] = "/equip Master Spellstone\n/run UpdateLockPrep()",
+        --     [10] = "/cast Create Healthstone\n/run UpdateLockPrep()",
+        --     [11] = "/run if not TradeFrame:IsShown() then InitiateTrade('party1') end\n/run UpdateLockPrep()",
+        --     [12] = "/run for i=0,4 do for x=1,GetContainerNumSlots(i) do y=GetContainerItemLink(i,x) if y then if string.find(GetItemInfo(y),'Healthstone') ~= nil then UseContainerItem(i,x) return end end end end\n/run UpdateLockPrep()",
+        --     [13] = "/run AcceptTrade()\n/run UpdateLockPrep()",
+        -- }
     else
         local texts = {
-            [1] = "/cast [nopet] Summon Imp\n/stopcasting [pet:Imp]\n/run UpdateLockPrep()",
+            [1] = "/cast [nopet:Imp] Summon Imp\n/stopcasting [pet:Imp]\n/run UpdateLockPrep()",
             [3] = "/cast [@player] Fire Shield\n/cast [@player] Unending Breath\n/run UpdateLockPrep()",
             [5] = "/cast [@player] Detect Invisibility\n/run UpdateLockPrep()",
             [6] = "/cast Fel Armor\n/run UpdateLockPrep()",
@@ -136,6 +165,10 @@ function UpdateLockPrep()
             [10] = "/cast Create Healthstone\n/run UpdateLockPrep()",
         }
         if not UnitExists('pet') then
+            -- Summon Imp
+            LockPrepMacro:SetAttribute("macrotext", texts[1])
+
+        elseif NoBuffExists('player', 'Fire Shield') and UnitCreatureFamily('pet') ~= "Imp" then
             -- Summon Imp
             LockPrepMacro:SetAttribute("macrotext", texts[1])
 
@@ -178,12 +211,16 @@ end
 function events:PLAYER_LOGIN(...)
     LockPrepMacro:RegisterForClicks("AnyUp")
     LockPrepMacro:SetAttribute("type", "macro")
-    LockPrepMacro:SetAttribute("macrotext", "/run UpdateLockPrep()")
 end
 
 function events:PLAYER_ENTERING_WORLD(...)
     HSTraded = false
-    UpdateLockPrep()
+    LockPrepMacro:SetAttribute("macrotext", "/cast Summon Imp\n/run UpdateLockPrep()")
+    -- UpdateLockPrep()
+end
+
+function events:TRADE_CLOSED(...)
+    HSTraded = true
 end
 
 LockPrepMacro:SetScript("OnEvent", function(self, event, ...)
