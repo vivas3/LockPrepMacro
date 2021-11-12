@@ -58,7 +58,7 @@ function UpdateLockPrep()
             [9] = "/equip Master Spellstone\n/run UpdateLockPrep()",
             [10] = "/cast Create Healthstone\n/run UpdateLockPrep()",
             [11] = "/run if not TradeFrame:IsShown() then InitiateTrade('party1') end\n/run UpdateLockPrep()",
-            [12] = "/run if TradeFrame:IsShown() then for i=0,4 do for x=1,GetContainerNumSlots(i) do y=GetContainerItemLink(i,x) if y then if string.find(GetItemInfo(y),'Healthstone') ~= nil then UseContainerItem(i,x) return end end end end end\n/run UpdateLockPrep()",
+            [12] = "/run for i=0,4 do for x=1,GetContainerNumSlots(i) do y=GetContainerItemLink(i,x) if y then if string.find(GetItemInfo(y),'Healthstone') ~= nil then UseContainerItem(i,x) return end end end end\n/run UpdateLockPrep()",
             [13] = "/run AcceptTrade()\n/run UpdateLockPrep()",
         }
         
@@ -70,7 +70,7 @@ function UpdateLockPrep()
             -- Cast Fire Shield and Unending Breath on party1
             LockPrepMacro:SetAttribute("macrotext", texts[2])
 
-        elseif NoBuffExists('player', 'Fire Shield') and NoBuffExists('player', 'Unending Breath') then
+        elseif NoBuffExists('player', 'Fire Shield') or NoBuffExists('player', 'Unending Breath') then
             -- Cast Fire Shield and Unending Breath on player
             LockPrepMacro:SetAttribute("macrotext", texts[3])
 
@@ -106,13 +106,13 @@ function UpdateLockPrep()
             -- Initiate Trade
             LockPrepMacro:SetAttribute("macrotext", texts[11])
 
-        elseif TradeFrame:IsShown() and NoTradingHS() then
+        elseif not HSTraded and TradeFrame:IsShown() and NoTradingHS() then
             -- Trade HS
             LockPrepMacro:SetAttribute("macrotext", texts[12])
 
         elseif TradeFrame:IsShown() then
             -- Accept Trade
-            LockPrepMacro:SetAttribute("macrotext", texts[12])
+            LockPrepMacro:SetAttribute("macrotext", texts[13])
             HSTraded = true
 
         elseif HSTraded and NoItemExists('Healthstone') then
