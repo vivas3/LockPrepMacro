@@ -238,7 +238,7 @@ function UpdateLockPrep()
             -- Summon Imp
             LockPrepMacro:SetAttribute("macrotext", texts[1])
 
-        elseif (NoBuffExists('player', 'Fire Shield') or NoBuffExists('party1', 'Fire Shield') or NoBuffExists('party2', 'Fire Shield')) and UnitCreatureFamily('pet') ~= "Imp" then
+        elseif (NoBuffExists('player', 'Fire Shield') or NoBuffExists('party1', 'Fire Shield') or NoBuffExists('party2', 'Fire Shield') or NoBuffExists('party3', 'Fire Shield') or NoBuffExists('party4', 'Fire Shield')) and UnitCreatureFamily('pet') ~= "Imp" then
             -- Summon Imp
             LockPrepMacro:SetAttribute("macrotext", texts[1])
 
