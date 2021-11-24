@@ -1,3 +1,9 @@
+local x = UnitClass("player")
+if x ~= "Warlock" then
+    print("LockPrepMacro: Not a lock!")
+    return
+end
+
 LockPrepMacro, HSTraded = CreateFrame("Button", "LockPrepMacro", nil, "SecureActionButtonTemplate"), false
 local events = {}
 
@@ -51,7 +57,7 @@ function ArenaCheck(num)
 end
 
 function RoSReady()
-    local start, duration, enabled = GetSpellCooldown("Ritual of Souls");
+    local start, duration = GetSpellCooldown("Ritual of Souls");
     if (start > 0 and duration > 15 ) then
         return false
     end
