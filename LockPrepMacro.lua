@@ -1,5 +1,6 @@
-local x = UnitClass("player")
-if x ~= "Warlock" then
+local class = UnitClass("player")
+if class ~= "Warlock" then
+    -- Not really any point for this addon if you're not a lock!
     print("LockPrepMacro: Not a lock!")
     return
 end
