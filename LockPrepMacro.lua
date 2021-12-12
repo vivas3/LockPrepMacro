@@ -40,6 +40,14 @@ function NoCastingSpecificSpell(checkedSpell)
     return false
 end
 
+-- function NoChannelingSpecificSpell(checkedSpell)
+--     local spell = UnitChannelInfo('player')
+--     if spell ~= checkedSpell then
+--         return true
+--     end
+--     return false
+-- end
+
 function NoTradingHS()
     local item1 = GetTradePlayerItemInfo(1)
     if item1 == "Master Healthstone" then
@@ -58,8 +66,9 @@ function ArenaCheck(num)
 end
 
 function RoSReady()
-    local start, duration = GetSpellCooldown("Ritual of Souls");
-    if (start > 0 and duration > 15 ) then
+    local start, duration, cdEnabled = GetSpellCooldown('Ritual of Souls');
+    if (start > 0 and duration > 15 and cdEnabled == 1) then
+        -- If channeling the spell cdEnabled will be 0
         return false
     end
     return true
@@ -184,7 +193,7 @@ function UpdateLockPrep()
         elseif not NoItemExists('Master Spellstone') and not IsEquippedItem('Master Spellstone') then
             -- Equip Master Spellstone if it exists
             LockPrepMacro:SetAttribute("macrotext", texts[11])
-        elseif RoSReady() and NoCastingSpecificSpell('Ritual of Souls') then
+        elseif RoSReady() then
             -- HS for all!!!
             LockPrepMacro:SetAttribute("macrotext", texts[12])
         else
@@ -258,7 +267,7 @@ function UpdateLockPrep()
         elseif not NoItemExists('Master Spellstone') and not IsEquippedItem('Master Spellstone') then
             -- Equip Master Spellstone if it exists
             LockPrepMacro:SetAttribute("macrotext", texts[15])
-        elseif RoSReady() and NoCastingSpecificSpell('Ritual of Souls') then
+        elseif RoSReady() then
             -- HS for all!!!
             LockPrepMacro:SetAttribute("macrotext", texts[16])
         else
